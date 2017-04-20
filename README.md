@@ -1,3 +1,4 @@
+```
 usage: demo_builder.py [-h] -y URL -d PATH -t PATH [-l INT] [-f PATH]
                        [-g PATH] [--description-field MD_FIELD_ID]
                        [--tags-field MD_FIELD_ID]
@@ -36,3 +37,4 @@ optional arguments:
 
 This script requires ffmpeg, youtube-dl and requests be installed. You can
 install youtube-dl and requests with pip.
+```
