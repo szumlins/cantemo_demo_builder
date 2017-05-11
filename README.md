@@ -48,10 +48,10 @@ demo_builder.py [-h] -y URL -d PATH -t PATH [-l INT] [-f PATH]
 
 ### Example Syntax
 
-`python -y https://www.youtube.com/channel/UCxKextGEOb00qlNpFuAZgSQ -l 2 -t /path/to/processing/folder -d /path/to/cantemoportal/storage`
+`python ./demo_builder.py -y https://www.youtube.com/channel/UCxKextGEOb00qlNpFuAZgSQ -l 2 -t /path/to/processing/folder -d /path/to/cantemoportal/storage`
 
 This will grab the first two items on my Youtube channel, place them in the `/path/to/processing/folder`, then create a folder `/path/to/processing/folder/encodes`, place encoded files and xml sidecar there, and move all those items to `/path/to/cantemoportal/storage` when complete.
 
-`python -y https://www.youtube.com/channel/UCxKextGEOb00qlNpFuAZgSQ -t /path/to/processing/folder -d /path/to/cantemoportal/storage -f /root/bin/ffmpeg --tags-field portal_mf34323`
+`python ./demo_builder.py -y https://www.youtube.com/channel/UCxKextGEOb00qlNpFuAZgSQ -t /path/to/processing/folder -d /path/to/cantemoportal/storage -f /root/bin/ffmpeg --tags-field portal_mf34323`
 
 This will download all items from my Youtube channel, place them in the `/path/to/processing/folder`, then create a folder `/path/to/processing/folder/encodes`, place encoded files and xml sidecar there, and move all those items to `/path/to/cantemoportal/storage` when complete.  It will assume the ffmpeg binary lives in `/root/bin/ffmpeg` on your system for the XDCAM encode.  It will also populate the XML sidecar with the tags from the Youtube items and assign them to the Cantemo Portal tags field `portal_mf34323`
