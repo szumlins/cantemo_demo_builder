@@ -35,13 +35,19 @@ def check_vars():
 	if not os.path.exists(args.temp_dir):
 		print "Path " + args.temp_dir + " could not be found.  Exiting."
 		exit(1)
-
+	if not os.path.isfile(args.ffmpeg_path):
+		print "ffmpeg path not defined or incorrect (" + args.ffmpeg_path + ")"
+		exit(1)
+	if not os.path.isfile(args.youtubedl_path):
+		print "youtube-dl path not defined or incorrect (" + args.youtubedl_path + ")"
+		exit(1)
+		
 def encode_item(item_path):
 	if not os.path.exists(os.path.abspath(args.temp_dir) + '/encodes'):
 		os.makedirs(os.path.abspath(args.temp_dir) + '/encodes')
 	this_filename = os.path.splitext(os.path.basename(item_path))[0]
 	out_file = os.path.abspath(args.temp_dir) + '/encodes/' + this_filename + '.mxf'	
-	print 'Starting encode of ' + out_file
+	print 'Starting encode of ' + out_file + ' from ' + item_path
 	ffcmd = [args.ffmpeg_path,'-y','-i',item_path,'-hide_banner','-loglevel','info','-r','29.97','-vf','scale=1920:1080','-pix_fmt','yuv422p','-vcodec','mpeg2video','-non_linear_quant','1','-flags','+ildct+ilme','-top','1','-dc','10','-intra_vlc','1','-qmax','3','-lmin','1*QP2LAMBDA','-vtag','xd5c','-rc_max_vbv_use','1','-rc_min_vbv_use','1','-g','12','-b:v','50000k','-minrate','50000k','-maxrate','50000k','-bufsize','8000k','-acodec','pcm_s16le','-ar','48000','-bf','2','-ac','2',out_file]
 	p = subprocess.Popen(ffcmd)
 	p.wait()
