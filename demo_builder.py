@@ -4,6 +4,8 @@ import argparse
 import subprocess
 import requests
 import json
+import codecs
+
 from xml.sax.saxutils import escape
 
 #build our arguments
@@ -48,6 +50,7 @@ def encode_item(item_path):
 	this_filename = os.path.splitext(os.path.basename(item_path))[0]
 	out_file = os.path.abspath(args.temp_dir) + '/encodes/' + this_filename + '.mxf'	
 	print 'Starting encode of ' + out_file + ' from ' + item_path
+	#change this line if you want something other than XDCAM for your high res
 	ffcmd = [args.ffmpeg_path,'-y','-i',item_path,'-hide_banner','-loglevel','info','-r','29.97','-vf','scale=1920:1080','-pix_fmt','yuv422p','-vcodec','mpeg2video','-non_linear_quant','1','-flags','+ildct+ilme','-top','1','-dc','10','-intra_vlc','1','-qmax','3','-lmin','1*QP2LAMBDA','-vtag','xd5c','-rc_max_vbv_use','1','-rc_min_vbv_use','1','-g','12','-b:v','50000k','-minrate','50000k','-maxrate','50000k','-bufsize','8000k','-acodec','pcm_s16le','-ar','48000','-bf','2','-ac','2',out_file]
 	p = subprocess.Popen(ffcmd)
 	p.wait()
@@ -59,7 +62,6 @@ def parse_item(item_path):
 	#parse out our json from YT
 	with open(item_path) as data_file:    
 		data = json.load(data_file)
-		
 	#build our metadata template
 	metadata_doc_template = """<?xml version="1.0" encoding="UTF-8"?>
 <MetadataDocument xmlns="http://xml.vidispine.com/schema/vidispine">
@@ -78,24 +80,26 @@ def parse_item(item_path):
 		</field>"""
 
 	if args.md_tags is not False:
-		metadata_doc_template = metadata_doc_template + """
-		<field>
-			<name>""" + args.md_tags + """</name>"""
-		for tag in data['tags']:
+		if data['tags'] != None:
 			metadata_doc_template = metadata_doc_template + """
-			<value>""" + escape(tag) + """</value>"""
-		metadata_doc_template = metadata_doc_template + """
-		</field>""" 
+			<field>
+				<name>""" + args.md_tags + """</name>"""
+			for tag in data['tags']:
+				metadata_doc_template = metadata_doc_template + """
+				<value>""" + escape(tag) + """</value>"""
+			metadata_doc_template = metadata_doc_template + """
+			</field>""" 
 
-	if args.md_cat is not False:		
-		metadata_doc_template = metadata_doc_template + """
-		<field>
-			<name>""" + args.md_cat + """</name>"""
-		for cat in data['categories']: 
+	if args.md_cat is not False:
+		if data['categories'] != None:		
 			metadata_doc_template = metadata_doc_template + """
-			<value>""" + escape(cat) + """</value>"""
-		metadata_doc_template = metadata_doc_template + """
-		</field>"""
+			<field>
+				<name>""" + args.md_cat + """</name>"""
+			for cat in data['categories']: 
+				metadata_doc_template = metadata_doc_template + """
+				<value>""" + escape(cat) + """</value>"""
+			metadata_doc_template = metadata_doc_template + """
+			</field>"""
 
 	metadata_doc_template = metadata_doc_template + """			
 	</timespan>
@@ -108,10 +112,11 @@ def parse_item(item_path):
 	#create our xml sidecar
 	try:
 		f = open(out_file,'w')
-		f.write(metadata_doc_template)
+		f.write(codecs.encode(metadata_doc_template,"UTF-8"))
 		f.close()
-	except:
+	except Exception as e:
 		print "Couldn't create xml sidecar"	
+		print e
 
 #form validation
 check_vars()
